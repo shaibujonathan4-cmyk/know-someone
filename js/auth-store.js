@@ -53,6 +53,7 @@ const AuthStore = {
   },
 
   // Redirects to login if no one is signed in. Call this at the top of any protected page.
+  // `pathToLogin` should be the relative path to login.html from the current page.
   async requireAuth(pathToLogin) {
     const user = await this.getCurrentUser();
     if (!user) {
@@ -69,7 +70,7 @@ const AuthStore = {
       case 'auth/user-not-found':
       case 'auth/wrong-password':
       case 'auth/invalid-credential': return 'Invalid email or password.';
-      default: return 'Something went wrong. Please try again.';
+      default: return `Something went wrong (${err.code || 'unknown'}): ${err.message || err}`;
     }
   }
 
