@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wallet — Know Someone</title>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+
+  <header class="topbar">
+    <button class="icon-btn" id="backBtn">←</button>
+    <h1 class="logo">Wallet</h1>
+    <span></span>
+  </header>
+
+  <main class="wallet-page">
+
+    <div class="balance-card">
+      <p class="balance-label">Available Balance</p>
+      <h2 class="balance-amount" id="balanceAmount">₦0</h2>
+      <div class="balance-actions">
+        <button class="primary-btn small" id="topUpBtn">Top Up</button>
+        <button class="secondary-btn small" id="withdrawBtn">Withdraw</button>
+      </div>
+    </div>
+
+    <div class="escrow-card">
+      <p class="escrow-label">🔒 In Escrow (active requests)</p>
+      <h3 class="escrow-amount" id="escrowAmount">₦0</h3>
+    </div>
+
+    <div class="panel hidden" id="topUpPanel">
+      <label class="form-label">Amount to top up (₦)</label>
+      <input type="number" class="form-input" id="topUpAmount" placeholder="e.g. 5000" min="500" />
+      <button class="primary-btn" id="confirmTopUp">Continue to Payment</button>
+    </div>
+
+    <div class="panel hidden" id="withdrawPanel">
+      <label class="form-label">Amount to withdraw (₦)</label>
+      <input type="number" class="form-input" id="withdrawAmount" placeholder="e.g. 5000" min="500" />
+      <label class="form-label">Bank Account</label>
+      <select class="form-input" id="bankAccount">
+        <option value="">Select account</option>
+      </select>
+      <button class="primary-btn" id="confirmWithdraw">Withdraw</button>
+    </div>
+
+    <h3 class="section-title">Transaction History</h3>
+    <div class="tx-list" id="txList">
+      <p class="empty-state">No transactions yet.</p>
+    </div>
+
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+  <script src="../js/firebase-config.js"></script>
+  <script src="../js/auth-store.js"></script>
+  <script src="../js/wallet-store.js"></script>
+  <script src="../js/wallet.js"></script>
+</body>
+</html>

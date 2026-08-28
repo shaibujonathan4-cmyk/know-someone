@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Post a Need — Know Someone</title>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+
+  <header class="topbar">
+    <button class="icon-btn" id="backBtn">←</button>
+    <h1 class="logo">Post a Need</h1>
+    <span></span>
+  </header>
+
+  <main class="form-page">
+    <form id="postForm">
+
+      <label class="form-label">What do you need?</label>
+      <input type="text" class="form-input" id="title" placeholder="e.g. Need a generator repair technician" required />
+
+      <label class="form-label">Description</label>
+      <textarea class="form-input" id="description" rows="4" placeholder="Give more detail about what you need and why" required></textarea>
+
+      <label class="form-label">Location</label>
+      <div class="location-row">
+        <input type="text" class="form-input" id="location" placeholder="Tap the button to detect, or type manually" required />
+        <button type="button" class="location-btn" id="useLocationBtn">📍 Use my location</button>
+      </div>
+      <p class="location-status" id="locationStatus"></p>
+
+      <label class="form-label">Urgency</label>
+      <div class="urgency-toggle">
+        <button type="button" class="urgency-btn" data-value="normal">Normal</button>
+        <button type="button" class="urgency-btn active" data-value="urgent">Urgent</button>
+      </div>
+
+      <label class="form-label">Reward Amount (₦)</label>
+      <input type="number" class="form-input" id="reward" placeholder="e.g. 10000" min="500" required />
+
+      <div class="wallet-note" id="walletNote">
+        Wallet balance: <strong>₦0</strong> — <a href="wallet.html">Top up</a>
+      </div>
+
+      <button type="submit" class="primary-btn" id="submitBtn">Lock Reward & Post</button>
+
+    </form>
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+  <script src="../js/firebase-config.js"></script>
+  <script src="../js/auth-store.js"></script>
+  <script src="../js/wallet-store.js"></script>
+  <script src="../js/request-store.js"></script>
+  <script src="../js/post.js"></script>
+</body>
+</html>

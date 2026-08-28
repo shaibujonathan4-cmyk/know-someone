@@ -1,0 +1,11 @@
+{
+  "hosting": {
+    "site": "know-someone-1f0c1",
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}
