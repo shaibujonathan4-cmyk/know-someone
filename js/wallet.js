@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
 
+ try {
   const user = await AuthStore.requireAuth('login.html');
   if (!user) return;
 
@@ -17,8 +18,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const escrowAmount = document.getElementById('escrowAmount');
   const txList = document.getElementById('txList');
 
-  await render();
-
+  // Attach all button behavior FIRST, so a data-loading problem below
+  // can never leave the buttons unresponsive.
   backBtn.addEventListener('click', () => window.history.back());
 
   topUpBtn.addEventListener('click', () => {
@@ -30,6 +31,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     withdrawPanel.classList.toggle('hidden');
     topUpPanel.classList.add('hidden');
   });
+
+  try {
+    await render();
+  } catch (err) {
+    txList.innerHTML = `<p class="empty-state">Couldn't load wallet data: ${err.message || err}</p>`;
+  }
 
   confirmTopUp.addEventListener('click', () => {
     const amount = parseInt(document.getElementById('topUpAmount').value, 10);
@@ -56,3 +63,86 @@ document.addEventListener('DOMContentLoaded', async () => {
         confirmTopUp.textContent = 'Continue to Payment';
       }
     });
+
+    handler.openIframe();
+  });
+
+  async function verifyAndCredit(reference) {
+    confirmTopUp.textContent = 'Verifying payment...';
+
+    try {
+      const res = await fetch(VERIFY_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reference })
+      });
+
+      const data = await res.json();
+
+      if (!data.success) {
+        alert('Payment could not be verified. If you were charged, contact support with this reference: ' + reference);
+        confirmTopUp.disabled = false;
+        confirmTopUp.textContent = 'Continue to Payment';
+        return;
+      }
+
+      await WalletStore.topUp(data.amount);
+      document.getElementById('topUpAmount').value = '';
+      topUpPanel.classList.add('hidden');
+      await render();
+      alert(`₦${data.amount.toLocaleString()} added to your wallet!`);
+    } catch (err) {
+      alert('Could not verify payment. Please check your connection and contact support with reference: ' + reference);
+    } finally {
+      confirmTopUp.disabled = false;
+      confirmTopUp.textContent = 'Continue to Payment';
+    }
+  }
+
+  confirmWithdraw.addEventListener('click', async () => {
+    const amount = parseInt(document.getElementById('withdrawAmount').value, 10);
+    const bank = document.getElementById('bankAccount').value;
+
+    if (!amount || amount < 500) {
+      alert('Enter a valid amount (minimum ₦500).');
+      return;
+    }
+    if (!bank) {
+      alert('Select a bank account.');
+      return;
+    }
+
+    // TODO: real Paystack Transfers integration — coming next
+    const updated = await WalletStore.withdraw(amount);
+    if (!updated) {
+      alert('Insufficient balance.');
+      return;
+    }
+    await render();
+    alert(`Withdrawal of ₦${amount.toLocaleString()} initiated (simulated — real transfers coming soon).`);
+  });
+
+  async function render() {
+    const wallet = await WalletStore.getWallet();
+
+    balanceAmount.textContent = `₦${wallet.balance.toLocaleString()}`;
+    escrowAmount.textContent = `₦${wallet.escrow.toLocaleString()}`;
+
+    if (wallet.transactions.length === 0) {
+      txList.innerHTML = `<p class="empty-state">No transactions yet.</p>`;
+      return;
+    }
+
+    txList.innerHTML = wallet.transactions.map(tx => `
+      <div class="tx-item">
+        <span class="tx-type">${tx.type.replace('_', ' ')}</span>
+        <span class="tx-amount">₦${tx.amount.toLocaleString()}</span>
+      </div>
+    `).join('');
+  }
+
+ } catch (outerErr) {
+   alert('Wallet page error: ' + (outerErr.message || outerErr));
+ }
+
+});
