@@ -1,10 +1,10 @@
 const firebaseConfig = {
-  apiKey: "AIzaSyC5q82ECvpexyypLVuYayLKAGrNIhIheI0",
-  authDomain: "know-someone-1f0c1.firebaseapp.com",
-  projectId: "know-someone-1f0c1",
-  storageBucket: "know-someone-1f0c1.firebasestorage.app",
-  messagingSenderId: "1029213386638",
-  appId: "1:1029213386638:web:5043bf0a872b79d8ea16df"
+  apiKey: "AIzaSyCuIwbsn71gBbHe2mScOeEZFu-z8qegSnQ",
+  authDomain: "know-someone-f08a3.firebaseapp.com",
+  projectId: "know-someone-f08a3",
+  storageBucket: "know-someone-f08a3.firebasestorage.app",
+  messagingSenderId: "1010235911327",
+  appId: "1:1010235911327:web:35f2dc5ac038a0223546aa"
 };
 
 firebase.initializeApp(firebaseConfig);
