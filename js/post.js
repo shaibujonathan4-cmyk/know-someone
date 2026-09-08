@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', async () => {
 
   const user = await AuthStore.requireAuth('login.html');
-  if (!user) return;
+  if (!user) return; // requireAuth already redirected
 
   const form = document.getElementById('postForm');
   const urgencyBtns = document.querySelectorAll('.urgency-btn');
@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       location,
       urgency,
       reward,
-      status: 'open',
+      status: 'open',      // open -> claimed -> completed
       claimedBy: null,
       rewardClaimed: false,
       postedAt: new Date().toISOString(),
@@ -126,19 +126,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   async function lockRewardAndPost(request) {
+    submitBtn.disabled = true;
+    submitBtn.classList.add('btn-loading');
+
     const updatedWallet = await WalletStore.lockEscrow(request.reward);
 
     if (!updatedWallet) {
       alert('Something went wrong locking the reward. Please try again.');
       submitBtn.disabled = false;
-      submitBtn.textContent = 'Lock Reward & Post';
+      submitBtn.classList.remove('btn-loading');
       return;
     }
 
     await RequestStore.add(request);
-
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Posting...';
 
     setTimeout(() => {
       alert('Reward locked and request posted!');

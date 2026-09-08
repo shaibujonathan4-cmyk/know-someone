@@ -37,11 +37,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     `).join('');
 
     document.querySelectorAll('.claim-btn').forEach(btn => {
-      btn.addEventListener('click', () => handleClaim(btn.dataset.id));
+      btn.addEventListener('click', () => handleClaim(btn.dataset.id, btn));
     });
   }
 
-  async function handleClaim(id) {
+  async function handleClaim(id, btn) {
+    btn.disabled = true;
+    btn.classList.add('btn-loading');
     await RequestStore.claim(id, user.uid);
     alert('Request claimed! Head to "My Claims" to follow up.');
     await renderFeed();

@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     confirmTopUp.disabled = true;
-    confirmTopUp.textContent = 'Opening payment...';
+    confirmTopUp.classList.add('btn-loading');
 
     const handler = PaystackPop.setup({
       key: PAYSTACK_PUBLIC_KEY,
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       },
       onClose: function () {
         confirmTopUp.disabled = false;
-        confirmTopUp.textContent = 'Continue to Payment';
+        confirmTopUp.classList.remove('btn-loading');
       }
     });
 
@@ -68,8 +68,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   async function verifyAndCredit(reference) {
-    confirmTopUp.textContent = 'Verifying payment...';
-
     try {
       const res = await fetch(VERIFY_ENDPOINT, {
         method: 'POST',
@@ -82,7 +80,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (!data.success) {
         alert('Payment could not be verified. If you were charged, contact support with this reference: ' + reference);
         confirmTopUp.disabled = false;
-        confirmTopUp.textContent = 'Continue to Payment';
+        confirmTopUp.classList.remove('btn-loading');
         return;
       }
 
@@ -95,7 +93,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       alert('Could not verify payment. Please check your connection and contact support with reference: ' + reference);
     } finally {
       confirmTopUp.disabled = false;
-      confirmTopUp.textContent = 'Continue to Payment';
+      confirmTopUp.classList.remove('btn-loading');
     }
   }
 
@@ -112,8 +110,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
+    confirmWithdraw.disabled = true;
+    confirmWithdraw.classList.add('btn-loading');
+
     // TODO: real Paystack Transfers integration — coming next
     const updated = await WalletStore.withdraw(amount);
+
+    confirmWithdraw.disabled = false;
+    confirmWithdraw.classList.remove('btn-loading');
+
     if (!updated) {
       alert('Insufficient balance.');
       return;

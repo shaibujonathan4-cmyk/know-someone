@@ -35,16 +35,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     `).join('');
 
     document.querySelectorAll('.claim-btn').forEach(btn => {
-      btn.addEventListener('click', () => confirmCompleted(btn.dataset.id));
+      btn.addEventListener('click', () => confirmCompleted(btn.dataset.id, btn));
     });
   }
 
-  async function confirmCompleted(id) {
+  async function confirmCompleted(id, btn) {
     const req = await RequestStore.getById(id);
     if (!req) return;
 
     if (!confirm(`Confirm this job is done? ₦${req.reward.toLocaleString()} will be released from escrow, and the connector can then claim it.`)) return;
 
+    btn.disabled = true;
+    btn.classList.add('btn-loading');
+
+    // Requester releases their OWN escrow (self-write — matches Firestore rules)
     await WalletStore.releaseEscrow(req.reward);
     await RequestStore.markCompleted(id);
 

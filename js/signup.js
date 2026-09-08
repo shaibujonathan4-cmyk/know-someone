@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
 
+  // If already logged in, skip straight to the app
   const existingUser = await AuthStore.getCurrentUser();
   if (existingUser) {
     window.location.href = 'home.html';
@@ -26,7 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Creating account...';
+    submitBtn.classList.add('btn-loading');
 
     const result = await AuthStore.signup(name, email, password);
 
@@ -34,7 +35,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       formError.textContent = result.message;
       formError.classList.remove('hidden');
       submitBtn.disabled = false;
-      submitBtn.textContent = 'Sign Up';
+      submitBtn.classList.remove('btn-loading');
       return;
     }
 

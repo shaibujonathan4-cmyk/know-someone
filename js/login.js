@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
 
+  // If already logged in, skip straight to the app
   const existingUser = await AuthStore.getCurrentUser();
   if (existingUser) {
     window.location.href = 'home.html';
@@ -18,7 +19,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     formError.classList.add('hidden');
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Logging in...';
+    submitBtn.classList.add('btn-loading');
 
     const result = await AuthStore.login(email, password);
 
@@ -26,7 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       formError.textContent = result.message;
       formError.classList.remove('hidden');
       submitBtn.disabled = false;
-      submitBtn.textContent = 'Log In';
+      submitBtn.classList.remove('btn-loading');
       return;
     }
 

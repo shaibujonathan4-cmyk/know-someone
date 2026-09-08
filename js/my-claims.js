@@ -40,13 +40,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     }).join('');
 
     document.querySelectorAll('.claim-btn').forEach(btn => {
-      btn.addEventListener('click', () => claimReward(btn.dataset.id));
+      btn.addEventListener('click', () => claimReward(btn.dataset.id, btn));
     });
   }
 
-  async function claimReward(id) {
+  async function claimReward(id, btn) {
     const req = await RequestStore.getById(id);
     if (!req) return;
+
+    btn.disabled = true;
+    btn.classList.add('btn-loading');
 
     const payout = Math.round(req.reward * (1 - PLATFORM_FEE_RATE));
 
