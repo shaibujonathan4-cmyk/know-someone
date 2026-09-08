@@ -1,4 +1,10 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+
+  const user = await AuthStore.requireAuth('login.html');
+  if (!user) return;
+
+  const PAYSTACK_PUBLIC_KEY = 'pk_test_348905d5b7340ef205ee7145dc9e44ea99b49926';
+  const VERIFY_ENDPOINT = 'https://know-someone.vercel.app/api/verify-payment';
 
   const backBtn = document.getElementById('backBtn');
   const topUpBtn = document.getElementById('topUpBtn');
@@ -11,14 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const escrowAmount = document.getElementById('escrowAmount');
   const txList = document.getElementById('txList');
 
-  // Placeholder wallet state — later this comes from the backend
-  let wallet = {
-    balance: 0,
-    escrow: 0,
-    transactions: [] // { id, type: 'topup'|'withdraw'|'escrow_lock'|'escrow_release', amount, date }
-  };
-
-  render();
+  await render();
 
   backBtn.addEventListener('click', () => window.history.back());
 
@@ -38,48 +37,22 @@ document.addEventListener('DOMContentLoaded', () => {
       alert('Enter a valid amount (minimum ₦500).');
       return;
     }
-    // TODO: redirect to Paystack checkout with this amount
-    // On successful payment webhook, backend credits wallet.balance
-    console.log('Initiating Paystack top-up for:', amount);
-    alert(`Redirecting to payment for ₦${amount.toLocaleString()}...`);
-  });
 
-  confirmWithdraw.addEventListener('click', () => {
-    const amount = parseInt(document.getElementById('withdrawAmount').value, 10);
-    const bank = document.getElementById('bankAccount').value;
+    confirmTopUp.disabled = true;
+    confirmTopUp.textContent = 'Opening payment...';
 
-    if (!amount || amount < 500) {
-      alert('Enter a valid amount (minimum ₦500).');
-      return;
-    }
-    if (amount > wallet.balance) {
-      alert('Insufficient balance.');
-      return;
-    }
-    if (!bank) {
-      alert('Select a bank account.');
-      return;
-    }
-    // TODO: call backend to initiate Paystack transfer to bank account
-    console.log('Initiating withdrawal:', amount, bank);
-    alert(`Withdrawal of ₦${amount.toLocaleString()} initiated.`);
-  });
-
-  function render() {
-    balanceAmount.textContent = `₦${wallet.balance.toLocaleString()}`;
-    escrowAmount.textContent = `₦${wallet.escrow.toLocaleString()}`;
-
-    if (wallet.transactions.length === 0) {
-      txList.innerHTML = `<p class="empty-state">No transactions yet.</p>`;
-      return;
-    }
-
-    txList.innerHTML = wallet.transactions.map(tx => `
-      <div class="tx-item">
-        <span class="tx-type">${tx.type.replace('_', ' ')}</span>
-        <span class="tx-amount">₦${tx.amount.toLocaleString()}</span>
-      </div>
-    `).join('');
-  }
-
-});
+    const handler = PaystackPop.setup({
+      key: PAYSTACK_PUBLIC_KEY,
+      email: user.email,
+      amount: amount * 100, // Paystack expects kobo
+      currency: 'NGN',
+      ref: 'ks_' + Date.now() + '_' + user.uid.slice(0, 6),
+      callback: function (response) {
+        // Payment popup succeeded — now verify it server-side before crediting
+        verifyAndCredit(response.reference);
+      },
+      onClose: function () {
+        confirmTopUp.disabled = false;
+        confirmTopUp.textContent = 'Continue to Payment';
+      }
+    });

@@ -8,6 +8,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   backBtn.addEventListener('click', () => window.history.back());
 
+  const PLATFORM_FEE_RATE = 0.10;
+
   await render();
 
   async function render() {
@@ -18,7 +20,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    feed.innerHTML = claims.map(r => `
+    feed.innerHTML = claims.map(r => {
+      const payout = Math.round(r.reward * (1 - PLATFORM_FEE_RATE));
+      return `
       <div class="request-card" data-id="${r.id}">
         <div class="request-header">
           <span class="badge ${r.status === 'completed' ? '' : 'urgent'}">${statusLabel(r)}</span>
@@ -29,10 +33,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         <p class="request-desc">${escapeHtml(r.description)}</p>
         <div class="request-footer">
           <span class="time">Posted ${RequestStore.timeAgo(r.postedAt)}</span>
-          ${r.status === 'completed' && !r.rewardClaimed ? `<button class="claim-btn" data-id="${r.id}">Claim ₦${r.reward.toLocaleString()}</button>` : ''}
+          ${r.status === 'completed' && !r.rewardClaimed ? `<button class="claim-btn" data-id="${r.id}">Claim ₦${payout.toLocaleString()}</button>` : ''}
         </div>
       </div>
-    `).join('');
+    `;
+    }).join('');
 
     document.querySelectorAll('.claim-btn').forEach(btn => {
       btn.addEventListener('click', () => claimReward(btn.dataset.id));
@@ -43,11 +48,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     const req = await RequestStore.getById(id);
     if (!req) return;
 
-    await WalletStore.creditSelf(req.reward);
+    const payout = Math.round(req.reward * (1 - PLATFORM_FEE_RATE));
+
+    // Connector credits their OWN wallet (self-write — matches Firestore rules)
+    // Payout is the reward minus the platform fee; the fee simply isn't
+    // credited to anyone, so it stays as revenue in the Paystack balance.
+    await WalletStore.creditSelf(payout);
     await RequestStore.markRewardClaimed(id);
 
     await render();
-    alert(`₦${req.reward.toLocaleString()} added to your wallet!`);
+    alert(`₦${payout.toLocaleString()} added to your wallet! (₦${(req.reward - payout).toLocaleString()} platform fee deducted)`);
   }
 
   function statusLabel(r) {
