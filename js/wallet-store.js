@@ -1,6 +1,7 @@
 const WalletStore = {
 
   async currentUid() {
+    if (auth.currentUser) return auth.currentUser.uid;
     const user = await AuthStore.getCurrentUser();
     return user ? user.uid : null;
   },
@@ -22,7 +23,7 @@ const WalletStore = {
 
   async save(wallet) {
     const uid = await this.currentUid();
-    if (!uid) return;
+    if (!uid) throw new Error('No logged-in user found — cannot save wallet.');
     await db.collection('wallets').doc(uid).set(wallet);
   },
 
