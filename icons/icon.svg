@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="kGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563EB"/>
+      <stop offset="100%" stop-color="#3B82F6"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="512" height="512" rx="112" fill="#FFFFFF"/>
+
+  <!-- Main 'K' Body / Vertical Pin Bar -->
+  <rect x="150" y="120" width="48" height="272" rx="24" fill="url(#kGrad)"/>
+
+  <!-- Upper Referral Arrow (Pointing outward) -->
+  <path d="M220 270 L320 170 C330 160 350 165 350 180 V220 C350 225 345 230 340 235 L270 305 Z" fill="#2563EB"/>
+
+  <!-- Lower Connection Arrow (Linking back) -->
+  <path d="M220 242 L320 342 C330 352 350 347 350 332 V292 C350 287 345 282 340 277 L270 207 Z" fill="#60A5FA"/>
+
+  <!-- Active Node Indicator -->
+  <circle cx="350" cy="180" r="16" fill="#F59E0B"/>
+</svg>
