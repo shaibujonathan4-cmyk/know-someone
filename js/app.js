@@ -1,13 +1,13 @@
 document.addEventListener('DOMContentLoaded', async () => {
 
-  const user = await AuthStore.requireAuth('pages/login.html');
+  const user = await AuthStore.requireAuth('login.html');
   if (!user) return;
 
   const feed = document.getElementById('feed');
   const postBtn = document.getElementById('postBtn');
 
   postBtn.addEventListener('click', () => {
-    window.location.href = 'pages/post.html';
+    window.location.href = 'post.html';
   });
 
   await renderFeed();

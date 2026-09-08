@@ -11,35 +11,49 @@
 
   <header class="topbar">
     <h1 class="logo">Know<span>Someone</span></h1>
-    <button class="icon-btn" id="notifBtn">🔔</button>
   </header>
 
-  <main class="feed" id="feed"></main>
+  <main class="landing-page">
+    <div class="landing-hero">
+      <h2 class="landing-title">Need something done?<br>Someone already knows how.</h2>
+      <p class="landing-subtitle">Post what you need, offer a cash reward, and get connected to someone who knows the right person — or earn rewards by making the connection yourself.</p>
+    </div>
 
-  <button class="fab" id="postBtn">+</button>
+    <div class="landing-actions">
+      <button class="primary-btn" id="signupBtn">Get Started</button>
+      <button class="secondary-btn full-width" id="loginBtn">I already have an account</button>
+    </div>
 
-  <nav class="bottom-nav">
-    <button class="nav-item active" onclick="window.location.href='index.html'">
-      <span>🏠</span><small>Home</small>
-    </button>
-    <button class="nav-item" onclick="window.location.href='pages/my-requests.html'">
-      <span>📋</span><small>My Requests</small>
-    </button>
-    <button class="nav-item" onclick="window.location.href='pages/my-claims.html'">
-      <span>🤝</span><small>My Claims</small>
-    </button>
-    <button class="nav-item" onclick="window.location.href='pages/profile.html'">
-      <span>👤</span><small>Profile</small>
-    </button>
-  </nav>
+    <div class="landing-features">
+      <div class="landing-feature">
+        <span class="landing-feature-icon">📍</span>
+        <div>
+          <h3>Post a need</h3>
+          <p>Describe what you need and set a reward — from a repair technician to a rare connection.</p>
+        </div>
+      </div>
+      <div class="landing-feature">
+        <span class="landing-feature-icon">🤝</span>
+        <div>
+          <h3>Get connected</h3>
+          <p>Someone who knows the right person claims your request and makes the introduction.</p>
+        </div>
+      </div>
+      <div class="landing-feature">
+        <span class="landing-feature-icon">🔒</span>
+        <div>
+          <h3>Reward held safely</h3>
+          <p>Your reward is locked in escrow until the job's confirmed done — fair for everyone.</p>
+        </div>
+      </div>
+    </div>
+  </main>
 
   <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
   <script src="js/firebase-config.js"></script>
   <script src="js/auth-store.js"></script>
-  <script src="js/wallet-store.js"></script>
-  <script src="js/request-store.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/landing.js"></script>
 </body>
 </html>

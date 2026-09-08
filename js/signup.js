@@ -1,9 +1,8 @@
 document.addEventListener('DOMContentLoaded', async () => {
 
-  // If already logged in, skip straight to the app
   const existingUser = await AuthStore.getCurrentUser();
   if (existingUser) {
-    window.location.href = '../index.html';
+    window.location.href = 'home.html';
     return;
   }
 
@@ -39,7 +38,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    window.location.href = '../index.html';
+    window.location.href = 'home.html';
   });
 
 });
