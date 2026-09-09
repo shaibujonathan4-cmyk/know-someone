@@ -15,8 +15,7 @@
   <!-- PWA Manifest & CSS -->
   <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="css/style.css" />
-</head>
-<body>
+</head><body>
 
   <header class="topbar">
     <h1 class="logo">Know<span>Someone</span></h1>
@@ -26,36 +25,63 @@
     <div class="landing-hero">
       <h2 class="landing-title">Need something done?<br>Someone already knows how.</h2>
       <p class="landing-subtitle">Post what you need, offer a cash reward, and get connected to someone who knows the right person — or earn rewards by making the connection yourself.</p>
-    </div>
-
-    <div class="landing-actions">
-      <button class="primary-btn" id="signupBtn">Get Started</button>
+      <button class="primary-btn landing-cta" id="signupBtn">Post a Request — It's Free to Join</button>
       <button class="secondary-btn full-width" id="loginBtn">I already have an account</button>
     </div>
 
-    <div class="landing-features">
-      <div class="landing-feature">
-        <span class="landing-feature-icon">📍</span>
-        <div>
-          <h3>Post a need</h3>
-          <p>Describe what you need and set a reward — from a repair technician to a rare connection.</p>
+    <section class="landing-section">
+      <h3 class="section-title">🔴 Live Requests</h3>
+      <div class="feed" id="liveFeed">
+        <p class="empty-state">Loading live requests...</p>
+      </div>
+      <p class="landing-feed-note">Sign up to respond to a request or post your own.</p>
+    </section>
+
+    <section class="landing-section">
+      <h3 class="section-title">💰 What Can You Earn?</h3>
+      <div class="estimator-card">
+        <label class="form-label">What kind of need?</label>
+        <select class="form-input" id="estimatorCategory">
+          <option value="repairs">Repairs & Technicians</option>
+          <option value="referrals">Referrals & Connections</option>
+          <option value="business">Business & Suppliers</option>
+          <option value="logistics">Logistics & Delivery</option>
+          <option value="other">Other</option>
+        </select>
+        <div class="estimator-result">
+          <p class="estimator-label">Typical reward range</p>
+          <p class="estimator-range" id="estimatorRange">₦2,000 – ₦10,000</p>
+        </div>
+        <p class="estimator-note">Actual rewards are set by whoever posts the request — this is just a general guide.</p>
+      </div>
+    </section>
+
+    <section class="landing-section">
+      <h3 class="section-title">How It Works</h3>
+      <div class="landing-features">
+        <div class="landing-feature">
+          <span class="landing-feature-icon">📍</span>
+          <div>
+            <h3>Post a need</h3>
+            <p>Describe what you need and set a reward — from a repair technician to a rare connection.</p>
+          </div>
+        </div>
+        <div class="landing-feature">
+          <span class="landing-feature-icon">🤝</span>
+          <div>
+            <h3>Get connected</h3>
+            <p>Someone who knows the right person claims your request and makes the introduction.</p>
+          </div>
+        </div>
+        <div class="landing-feature">
+          <span class="landing-feature-icon">🔒</span>
+          <div>
+            <h3>Reward held safely</h3>
+            <p>Your reward is locked in escrow until the job's confirmed done — fair for everyone.</p>
+          </div>
         </div>
       </div>
-      <div class="landing-feature">
-        <span class="landing-feature-icon">🤝</span>
-        <div>
-          <h3>Get connected</h3>
-          <p>Someone who knows the right person claims your request and makes the introduction.</p>
-        </div>
-      </div>
-      <div class="landing-feature">
-        <span class="landing-feature-icon">🔒</span>
-        <div>
-          <h3>Reward held safely</h3>
-          <p>Your reward is locked in escrow until the job's confirmed done — fair for everyone.</p>
-        </div>
-      </div>
-    </div>
+    </section>
   </main>
 
   <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
@@ -63,6 +89,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
   <script src="js/firebase-config.js"></script>
   <script src="js/auth-store.js"></script>
+  <script src="js/request-store.js"></script>
   <script src="js/landing.js"></script>
 </body>
 </html>

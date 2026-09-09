@@ -1,72 +1,83 @@
-document.addEventListener('DOMContentLoaded', async () => {
+const RequestStore = {
 
-  const user = await AuthStore.requireAuth('login.html');
-  if (!user) return;
+  collection() {
+    return db.collection('requests');
+  },
 
-  const feed = document.getElementById('myRequestsFeed');
-  const backBtn = document.getElementById('backBtn');
+  async getAll() {
+    const snapshot = await this.collection().orderBy('postedAt', 'desc').get();
+    return snapshot.docs.map(doc => doc.data());
+  },
 
-  backBtn.addEventListener('click', () => window.history.back());
+  // Public preview for the landing page — no login required, no owner filtering.
+  // Just the most recent open requests, limited to `limit` results.
+  async getPublicPreview(limit) {
+    const snapshot = await this.collection()
+      .where('status', '==', 'open')
+      .orderBy('postedAt', 'desc')
+      .limit(limit || 4)
+      .get();
+    return snapshot.docs.map(doc => doc.data());
+  },
 
-  await render();
+  async add(request) {
+    await this.collection().doc(request.id).set(request);
+    return request;
+  },
 
-  async function render() {
-    const requests = await RequestStore.getByOwner(user.uid);
+  async updateStatus(id, status) {
+    await this.collection().doc(id).update({ status });
+  },
 
-    if (requests.length === 0) {
-      feed.innerHTML = `<p class="empty-state">You haven't posted any requests yet.</p>`;
-      return;
-    }
+  async claim(id, connectorUid) {
+    const ref = this.collection().doc(id);
+    await ref.update({ status: 'claimed', claimedBy: connectorUid });
+    const doc = await ref.get();
+    return doc.data();
+  },
 
-    feed.innerHTML = requests.map(r => `
-      <div class="request-card" data-id="${r.id}">
-        <div class="request-header">
-          <span class="badge">${statusLabel(r.status)}</span>
-          <span class="reward">₦${r.reward.toLocaleString()}</span>
-        </div>
-        <h3 class="request-title">${escapeHtml(r.title)}</h3>
-        <p class="request-location">📍 ${escapeHtml(r.location)}</p>
-        <p class="request-desc">${escapeHtml(r.description)}</p>
-        <div class="request-footer">
-          <span class="time">Posted ${RequestStore.timeAgo(r.postedAt)}</span>
-          ${r.status === 'claimed' ? `<button class="claim-btn" data-id="${r.id}">Confirm Completed</button>` : ''}
-        </div>
-      </div>
-    `).join('');
+  async markCompleted(id) {
+    await this.collection().doc(id).update({ status: 'completed' });
+  },
 
-    document.querySelectorAll('.claim-btn').forEach(btn => {
-      btn.addEventListener('click', () => confirmCompleted(btn.dataset.id, btn));
-    });
+  async markRewardClaimed(id) {
+    await this.collection().doc(id).update({ rewardClaimed: true });
+  },
+
+  async getById(id) {
+    const doc = await this.collection().doc(id).get();
+    return doc.exists ? doc.data() : null;
+  },
+
+  async getByOwner(uid) {
+    const snapshot = await this.collection().where('ownerId', '==', uid).get();
+    return snapshot.docs.map(doc => doc.data())
+      .sort((a, b) => new Date(b.postedAt) - new Date(a.postedAt));
+  },
+
+  async getByClaimant(uid) {
+    const snapshot = await this.collection().where('claimedBy', '==', uid).get();
+    return snapshot.docs.map(doc => doc.data())
+      .sort((a, b) => new Date(b.postedAt) - new Date(a.postedAt));
+  },
+
+  async getOpenForOthers(uid) {
+    const snapshot = await this.collection().where('status', '==', 'open').get();
+    return snapshot.docs
+      .map(doc => doc.data())
+      .filter(r => r.ownerId !== uid)
+      .sort((a, b) => new Date(b.postedAt) - new Date(a.postedAt));
+  },
+
+  timeAgo(isoDate) {
+    const diffMs = Date.now() - new Date(isoDate).getTime();
+    const mins = Math.floor(diffMs / 60000);
+    if (mins < 1) return 'just now';
+    if (mins < 60) return `${mins} min${mins === 1 ? '' : 's'} ago`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs} hr${hrs === 1 ? '' : 's'} ago`;
+    const days = Math.floor(hrs / 24);
+    return `${days} day${days === 1 ? '' : 's'} ago`;
   }
 
-  async function confirmCompleted(id, btn) {
-    const req = await RequestStore.getById(id);
-    if (!req) return;
-
-    if (!confirm(`Confirm this job is done? ₦${req.reward.toLocaleString()} will be released from escrow, and the connector can then claim it.`)) return;
-
-    btn.disabled = true;
-    btn.classList.add('btn-loading');
-
-    // Requester releases their OWN escrow (self-write — matches Firestore rules)
-    await WalletStore.releaseEscrow(req.reward);
-    await RequestStore.markCompleted(id);
-
-    await render();
-    alert('Marked as completed. The connector can now claim their reward.');
-  }
-
-  function statusLabel(status) {
-    if (status === 'open') return 'Open';
-    if (status === 'claimed') return 'Claimed';
-    if (status === 'completed') return 'Completed';
-    return status;
-  }
-
-  function escapeHtml(str) {
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-  }
-
-});
+};
